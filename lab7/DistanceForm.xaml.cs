@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 namespace lab7
 {
     /// <summary>
-    /// Interaction logic for Window1.xaml
+    /// Interaction logic for DistanceForm.xaml
     /// </summary>
-    public partial class Window1 : Window
+    public partial class DistanceForm : Window
     {
-        public Window1()
+        public DistanceForm()
         {
             InitializeComponent();
         }

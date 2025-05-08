@@ -24,6 +24,7 @@ namespace lab7
     {
 
         private Window1 distanceForm;
+       
         private MapPoint firstClickedPoint;
         private MapPoint secondClickedPoint;
         private int clickCount = 0;
@@ -33,7 +34,9 @@ namespace lab7
             IsSketchTool = true;
             SketchType = SketchGeometryType.Rectangle;
             SketchOutputMode = SketchOutputMode.Map;
+            
             distanceForm = new Window1();
+            
             distanceForm.Visibility = System.Windows.Visibility.Visible;
             firstClickedPoint = null;
             secondClickedPoint = null;
