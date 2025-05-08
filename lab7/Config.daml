@@ -21,9 +21,10 @@
       <groups>
         <!-- comment this out if you have no controls on the Addin tab to avoid
               an empty group-->
-        <group id="lab7_Group1" caption="Group 1" appearsOnAddInTab="true">
+        <group id="lab7_Group1" caption="Uppgift 7: Distance Tool" appearsOnAddInTab="true">
           <!-- host controls within groups -->
           <tool refID="lab7_DistanceTool" size="large" />
+          <button refID="DistanceFormButton" size="large" />
         </group>
       </groups>
       <controls>
@@ -31,6 +32,9 @@
         <tool id="lab7_DistantTool" caption="Distance tool" className="DistanceTool" loadOnClick="true" smallImage="Sun32" largeImage="Sun32" condition="esri_mapping_mapPane">
           <tooltip heading="Uppgift 7">Uppgift 7<disabledText /></tooltip>
         </tool>
+        <button id="DistanceFormButton" caption="Open Distance form" className="Open_Distance_form" loadOnClick="true" smallImage="Measure_Distance16" largeImage="Measure_Distance32">
+          <tooltip heading="Distance form">Click to navigate to distance form<disabledText /></tooltip>
+        </button>
       </controls>
     </insertModule>
   </modules>

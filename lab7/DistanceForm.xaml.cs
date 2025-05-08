@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ArcGIS.Desktop.Mapping;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,9 +20,22 @@ namespace lab7
     /// </summary>
     public partial class DistanceForm : Window
     {
+        //public Map map;
         public DistanceForm()
         {
             InitializeComponent();
+            //map = MapView.Active.Map;
+        }
+
+        private void btnFirst_Click(object sender, RoutedEventArgs e)
+        {
+            this.Visibility = Visibility.Collapsed;
+           
+        }
+
+        private void btnSecond_Click(object sender, RoutedEventArgs e)
+        {
+            this.Visibility= Visibility.Collapsed;
         }
     }
 }
