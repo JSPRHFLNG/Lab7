@@ -7,11 +7,14 @@
         mc:Ignorable="d"
         Title="Distance form" Height="400" Width="350">
     <Grid x:Name="mainGrid" Background="#FFCECEA3">
-        <GroupBox x:Name="grbSelectCoordinates" Header="Select coordinates" Width="290" Height="120" Margin="19,26,41,238"/>
-        <Button x:Name="btnFirst" Content="First Coordinate" HorizontalAlignment="Left" Margin="28,55,0,0" VerticalAlignment="Top" Click="btnFirst_Click"/>
-        <Button x:Name="btnSecond" Content="Second coordinate" HorizontalAlignment="Left" Margin="29,100,0,0" VerticalAlignment="Top" Click="btnSecond_Click"/>
-        <TextBox x:Name="txtFirst" HorizontalAlignment="Left" Margin="175,55,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="txtSecond" HorizontalAlignment="Left" Margin="175,100,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <GroupBox x:Name="grbSelectCoordinates" Header="Select coordinates" MaxWidth="290" MaxHeight="120" Margin="30,114,30,150"/>
+        <Button x:Name="btnFirst" Content="First Coordinate" HorizontalAlignment="Left" Margin="40,145,0,0" VerticalAlignment="Top" Click="btnFirst_Click"/>
+        <Button x:Name="btnSecond" Content="Second coordinate" HorizontalAlignment="Left" Margin="40,190,0,0" VerticalAlignment="Top" Click="btnSecond_Click"/>
+        <TextBox x:Name="txtFirst" HorizontalAlignment="Left" Margin="185,145,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="txtSecond" HorizontalAlignment="Left" Margin="185,190,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <GroupBox Header="Select data" MaxWidth="290" MaxHeight="120" Margin="30, 20, 100, 280"/>
+        <Button x:Name="btnSelectPointData" Content="Point data" HorizontalAlignment="Left" Margin="60,50,0,0" VerticalAlignment="Top" Click="btnSelectPointData_Click"/>
+        <Button x:Name="btnSelectPolygonData" Content="Polygon data" HorizontalAlignment="Left" Margin="140,50,0,0" VerticalAlignment="Top" Click="btnSelectPolygonData_Click"/>
 
     </Grid>
 </Window>

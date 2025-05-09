@@ -86,6 +86,7 @@ namespace lab7
                     firstClickedPoint = clickedPoint;
                     System.Windows.MessageBox.Show(string.Format("X: {0} Y: {1} Z: {2}",
                         clickedPoint.X, clickedPoint.Y, clickedPoint.Z), "Map Coordinates");
+                    _ = AddMarker(firstClickedPoint);
 
                     System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                     {
@@ -99,12 +100,12 @@ namespace lab7
                     secondClickedPoint = clickedPoint;
                     System.Windows.MessageBox.Show(string.Format("X: {0} Y: {1} Z: {2}",
                         clickedPoint.X, clickedPoint.Y, clickedPoint.Z), "Map Coordinates");
-
+                    _ = AddMarker(secondClickedPoint);
                     System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                     {
                         distanceForm.Visibility = System.Windows.Visibility.Visible;
                         distanceForm.txtSecond.Text = secondClickedPoint.X.ToString() + " " + secondClickedPoint.Y.ToString();
-                        CalculateDistance();
+                        _ = CalculateDistance();
                     });
                 }
 
@@ -120,7 +121,7 @@ namespace lab7
                         distanceForm.txtFirst.Text = firstClickedPoint.X.ToString() + " " + firstClickedPoint.Y.ToString();
                         distanceForm.txtSecond.Clear();
                     });
-                    CalculateDistance();
+                    _ = CalculateDistance();
                 }
             });
         }
