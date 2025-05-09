@@ -7,20 +7,21 @@
         mc:Ignorable="d"
         Title="Distance form" Height="400" Width="350">
     <Grid x:Name="mainGrid" Background="#FFCECEA3">
-        
+
         <GroupBox x:Name="grbSelectCoordinates" Header="Select coordinates" MaxWidth="290" MaxHeight="120" Margin="30,220,30,40" BorderBrush="Black" FontWeight="Bold"/>
         <Button x:Name="btnFirst" Content="First Coordinate" HorizontalAlignment="Left" Margin="38,253,0,0" VerticalAlignment="Top" Click="btnFirst_Click"/>
         <Button x:Name="btnSecond" Content="Second coordinate" HorizontalAlignment="Left" Margin="38,298,0,0" VerticalAlignment="Top" Click="btnSecond_Click"/>
         <TextBox x:Name="txtFirst" HorizontalAlignment="Left" Margin="183,253,0,0" TextWrapping="Wrap" Text="Coordinates..." VerticalAlignment="Top" Width="120"/>
         <TextBox x:Name="txtSecond" HorizontalAlignment="Left" Margin="183,298,0,0" TextWrapping="Wrap" Text="Coordinates..." VerticalAlignment="Top" Width="120"/>
-        
-        <GroupBox x:Name="grbSelectData" Header="Select data" MaxWidth="290" MaxHeight="120" Margin="30, 20, 80, 300" BorderBrush="Black" FontWeight="Bold"/>
-        <Button x:Name="btnSelectPointData" Content="Point data" HorizontalAlignment="Left" Margin="60,50,0,0" VerticalAlignment="Top" Click="btnSelectPointData_Click"/>
-        <Button x:Name="btnSelectPolygonData" Content="Polygon data" HorizontalAlignment="Left" Margin="140,50,0,0" VerticalAlignment="Top" Click="btnSelectPolygonData_Click"/>
-        
-        <GroupBox x:Name="grbComboboxes" Header="Select and filter" MaxWidth="290" MaxHeight="120" Margin="30, 100, 80, 215" BorderBrush="Black" FontWeight="Bold"/>
-        <ComboBox x:Name="cmbSelectPointData" HorizontalAlignment="Left" Margin="155,130,0,0" VerticalAlignment="Top" Width="90"/>
-        <ComboBox x:Name="cmbSelectPolygonData" HorizontalAlignment="Left" Margin="50,130,0,0" VerticalAlignment="Top" Width="90"/>
+
+        <GroupBox x:Name="grbSelectData" Header="Select data" MaxWidth="290" MaxHeight="120" Margin="30,28,200,292" BorderBrush="Black" FontWeight="Bold"/>
+        <Button x:Name="btnSelectPointData" Content="Point data" HorizontalAlignment="Left" Margin="206,36,0,0" VerticalAlignment="Top" Click="btnSelectPointData_Click"/>
+        <Button x:Name="btnSelectPolygonData" Content="Polygon data" HorizontalAlignment="Left" Margin="201,75,0,0" VerticalAlignment="Top" Click="btnSelectPolygonData_Click"/>
+
+        <GroupBox x:Name="grbComboboxes" Header="Select and filter" MaxWidth="290" MaxHeight="120" Margin="30,133,80,182" BorderBrush="Black" FontWeight="Bold"/>
+        <ComboBox x:Name="cmbFields" HorizontalAlignment="Left" Margin="50,157,0,0" VerticalAlignment="Top" Width="80" SelectionChanged="cmbFields_SelectionChanged"/>
+        <ComboBox x:Name="cmbValues" HorizontalAlignment="Left" Margin="163,157,0,0" VerticalAlignment="Top" Width="80" SelectionChanged="cmbValues_SelectionChanged"/>
+        <Button x:Name="btnAddData" Content="Add data" HorizontalAlignment="Left" Margin="50,55,0,0" VerticalAlignment="Top" Click="btnAddData_Click"/>
 
     </Grid>
 </Window>
