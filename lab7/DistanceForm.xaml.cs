@@ -1,4 +1,5 @@
-﻿using ArcGIS.Desktop.Core.Geoprocessing;
+﻿using ArcGIS.Core.Data;
+using ArcGIS.Desktop.Core.Geoprocessing;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Mapping;
 using Microsoft.Win32;
@@ -28,6 +29,8 @@ namespace lab7
         public Map map;
         public FeatureLayer firstLayer;
         public FeatureLayer secondLayer;
+        public FeatureLayer polyLayer;
+        public FeatureLayer pointLayer;
 
         public DistanceForm()
         {
@@ -46,6 +49,45 @@ namespace lab7
             this.Visibility= Visibility.Collapsed;
         }
 
+        public async Task removeLayerIfExists(String layerName)
+        {
+            await QueuedTask.Run(() =>
+            {
+                var layers = MapView.Active.Map.Layers;
+                if (layers == null) return; 
+                var existingLayer = layers.FirstOrDefault(layer => layer.Name == layerName);
+                if (existingLayer != null)
+                {
+                    MapView.Active.Map.RemoveLayer(existingLayer);
+                }
+                    
+                
+            });
+        }
+
+        // FILTRERA DATA
+        private async void FilterDATA()
+        {
+            map = MapView.Active.Map;
+            await QueuedTask.Run(() =>
+            {
+                var featLayer = map.Layers.OfType<FeatureLayer>();
+                firstLayer = featLayer.ElementAt(0);
+                secondLayer = featLayer.ElementAt(1);
+
+                string whereClause = "NAME_2 = 'Gävle'";
+                QueryFilter queryFilter = new QueryFilter
+                {
+                    WhereClause = whereClause
+                };
+                secondLayer.Select(queryFilter, SelectionCombinationMethod.New);
+                var outputPath = @"H:\GIS_Applikationer\Lab1\Lab1\Lab7\selectedPoly.shp";
+                var parameters = Geoprocessing.MakeValueArray(secondLayer, outputPath);
+                Geoprocessing.ExecuteToolAsync("management.CopyFeatures", parameters);
+
+                _ = removeLayerIfExists("selectedPoly.shp");
+            });
+        }
 
         // LÄS IN DATA
         public string ChooseFile()
@@ -82,6 +124,7 @@ namespace lab7
                     if (layer is FeatureLayer featureLayer)
                     {
                         firstLayer = featureLayer;
+                        FilterDATA();
                     } 
                     else
                     {
