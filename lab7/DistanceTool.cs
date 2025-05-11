@@ -1,42 +1,39 @@
 ﻿using ArcGIS.Core.CIM;
-using ArcGIS.Core.Data;
 using ArcGIS.Core.Geometry;
-using ArcGIS.Desktop.Catalog;
-using ArcGIS.Desktop.Core;
-using ArcGIS.Desktop.Editing;
-using ArcGIS.Desktop.Extensions;
-using ArcGIS.Desktop.Framework;
-using ArcGIS.Desktop.Framework.Contracts;
-using ArcGIS.Desktop.Framework.Dialogs;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
-using ArcGIS.Desktop.KnowledgeGraph;
-using ArcGIS.Desktop.Layouts;
 using ArcGIS.Desktop.Mapping;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace lab7
 {
     internal class DistanceTool : MapTool
     {
-
-        private DistanceForm distanceForm;     
-        private MapPoint firstClickedPoint;
-        private MapPoint secondClickedPoint;
+        public Map map;
+        public DistanceForm distanceForm;  
+        public MapPoint firstClickedPoint;
+        public MapPoint secondClickedPoint;
         private int clickCount = 0;
 
         public DistanceTool()
         {
-            IsSketchTool = true;
+            IsSketchTool = false;
             SketchType = SketchGeometryType.Rectangle;
             SketchOutputMode = SketchOutputMode.Map;
             distanceForm = new DistanceForm();         
             distanceForm.Visibility = System.Windows.Visibility.Visible;
             firstClickedPoint = null;
             secondClickedPoint = null;
+            map = MapView.Active.Map;
+        }
+
+        protected override void OnToolMouseDown(MapViewMouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
+            {
+                e.Handled = true;
+                base.OnToolMouseDown(e);
+            }
+                
         }
 
         private async Task AddMarker(MapPoint point)
@@ -130,8 +127,17 @@ namespace lab7
 
         protected override Task OnToolActivateAsync(bool active)
         {
+
+            if (active)
+            {   
+                System.Windows.MessageBox.Show("DistanceTool is activated.");
+            }
+            
+
             return base.OnToolActivateAsync(active);
         }
+       
+
 
         protected override Task<bool> OnSketchCompleteAsync(Geometry geometry)
         {

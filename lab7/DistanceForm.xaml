@@ -5,23 +5,115 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:lab7"
         mc:Ignorable="d"
-        Title="Distance form" Height="400" Width="350">
-    <Grid x:Name="mainGrid" Background="#FFCECEA3">
+		ResizeMode="NoResize"
+		Topmost="True"
+        Title="Distance form" Height="600" Width="300">
+    <Grid x:Name="mainGrid" Margin="5" Background="#FFCECEA3">
 
-        <GroupBox x:Name="grbSelectCoordinates" Header="Select coordinates" MaxWidth="290" MaxHeight="120" Margin="30,220,30,40" BorderBrush="Black" FontWeight="Bold"/>
-        <Button x:Name="btnFirst" Content="First Coordinate" HorizontalAlignment="Left" Margin="38,253,0,0" VerticalAlignment="Top" Click="btnFirst_Click"/>
-        <Button x:Name="btnSecond" Content="Second coordinate" HorizontalAlignment="Left" Margin="38,298,0,0" VerticalAlignment="Top" Click="btnSecond_Click"/>
-        <TextBox x:Name="txtFirst" HorizontalAlignment="Left" Margin="183,253,0,0" TextWrapping="Wrap" Text="Coordinates..." VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="txtSecond" HorizontalAlignment="Left" Margin="183,298,0,0" TextWrapping="Wrap" Text="Coordinates..." VerticalAlignment="Top" Width="120"/>
+		<!-- 2 x 2 -->
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
 
-        <GroupBox x:Name="grbSelectData" Header="Select data" MaxWidth="290" MaxHeight="120" Margin="30,28,200,292" BorderBrush="Black" FontWeight="Bold"/>
-        <Button x:Name="btnSelectPointData" Content="Point data" HorizontalAlignment="Left" Margin="206,36,0,0" VerticalAlignment="Top" Click="btnSelectPointData_Click"/>
-        <Button x:Name="btnSelectPolygonData" Content="Polygon data" HorizontalAlignment="Left" Margin="201,75,0,0" VerticalAlignment="Top" Click="btnSelectPolygonData_Click"/>
+		<Grid.ColumnDefinitions>
+			<!--  -->
+			<ColumnDefinition Width="1*"/>
+			<ColumnDefinition Width="1*"/>
+		</Grid.ColumnDefinitions>
 
-        <GroupBox x:Name="grbComboboxes" Header="Select and filter" MaxWidth="290" MaxHeight="120" Margin="30,133,80,182" BorderBrush="Black" FontWeight="Bold"/>
-        <ComboBox x:Name="cmbFields" HorizontalAlignment="Left" Margin="50,157,0,0" VerticalAlignment="Top" Width="80" SelectionChanged="cmbFields_SelectionChanged"/>
-        <ComboBox x:Name="cmbValues" HorizontalAlignment="Left" Margin="163,157,0,0" VerticalAlignment="Top" Width="80" SelectionChanged="cmbValues_SelectionChanged"/>
-        <Button x:Name="btnAddData" Content="Add data" HorizontalAlignment="Left" Margin="50,55,0,0" VerticalAlignment="Top" Click="btnAddData_Click"/>
+        
 
-    </Grid>
+		<!-- Left - Polygon side-->
+		<GroupBox x:Name="grbSelectData" Header="Choose Polygons Data" Grid.Row="0" Grid.ColumnSpan="1" Height="80" Margin="0,10,0,0" BorderBrush="Black">
+			<StackPanel HorizontalAlignment="Center">
+
+				<Button x:Name="btnSelectPolygonData" Content="Polygon data" Height="20" Width="100" Margin="5,15,0,0" Click="btnSelectPolygonData_Click"/>
+			</StackPanel>
+		</GroupBox>
+
+        
+        
+		<GroupBox x:Name="grbComboboxes" Header="Select In Polygons" Grid.Row="1" Grid.ColumnSpan="1" Margin="2" BorderBrush="Black">
+			<StackPanel HorizontalAlignment="Center" Margin="0,10,0,0">
+                
+                <ComboBox x:Name="cmbPolygonFields" Margin="5,5,0,5" Height="20" Width="110" SelectionChanged="cmbPolygonFields_SelectionChanged">
+                    <ComboBoxItem IsEnabled="False" IsSelected="True" Content="Select field">
+                    </ComboBoxItem>
+                </ComboBox>
+                <ComboBox x:Name="cmbPolygonValues" Margin="5,5,0,5" Height="20" Width="110" SelectionChanged="cmbPolygonValues_SelectionChanged" >
+                    <ComboBoxItem IsEnabled="False" IsSelected="True" Content="Select value">
+                    </ComboBoxItem>
+                </ComboBox>
+                <Button x:Name="btnHighlightPolygons" Content="Highlight on map" Height="20" Width="100" Margin="5,15,0,10" Click="btnHighlightPolygons_Click"/>
+            </StackPanel>
+		</GroupBox>
+
+		<!-- Right - Point side -->
+        <GroupBox x:Name="grbSelectData2" Header="Choose Points Data" Grid.Row="0" Grid.Column="1" Height="80" Margin="0,10,0,0" BorderBrush="Black">
+			<StackPanel HorizontalAlignment="Center">
+				<Button x:Name="btnSelectPointData" Content="Point data" Height="20" Width="100" Margin="5,15,0,0" Click="btnSelectPointData_Click"/>
+			</StackPanel>
+		</GroupBox>
+
+		<GroupBox x:Name="grbComboboxesPoints" Header="Select In Points" Grid.Row="1" Grid.Column="1" BorderBrush="Black">
+            <StackPanel HorizontalAlignment="Center" Margin="0,10,0,0">
+
+                <ComboBox x:Name="cmbPointFields" Margin="5,5,0,5" Height="20" Width="110" SelectionChanged="cmbPointFields_SelectionChanged">
+                    <ComboBoxItem IsEnabled="False" IsSelected="True" Content="Select field">
+                    </ComboBoxItem>
+                </ComboBox>
+                <ComboBox x:Name="cmbPointValues" Margin="5,5,0,5" Height="20" Width="110" SelectionChanged="cmbPointValues_SelectionChanged">
+					<ComboBoxItem IsEnabled="False" IsSelected="True" Content="Select value">
+					</ComboBoxItem>
+
+                </ComboBox>
+                <Button x:Name="btnHighlightPoints" Content="Highlight on map" Height="20" Width="100" Margin="5,15,0,10" Click="btnHighlightPoints_Click"/>
+				
+			</StackPanel>
+		</GroupBox>
+
+
+        <GroupBox x:Name="grbSpatialRelationship" Header="Spatial Relationship" Grid.Row="2" Grid.ColumnSpan="2" Height="190">
+            <StackPanel Orientation="Vertical">
+                <ListBox x:Name="lbxSpatial" Height="80" Margin="0,5,0,0"></ListBox>
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <Label Content="Polygon >>" FontStyle="Oblique"></Label>
+                    <ComboBox x:Name="cmbSpatial" Margin="5,5,0,5" Height="20" Width="120" SelectionChanged="cmbSpatial_SelectionChanged">
+                        <ComboBoxItem IsEnabled="False" IsSelected="True" Content="Select Expression">
+                        </ComboBoxItem>
+                        <ComboBoxItem Content="Intersects"></ComboBoxItem>
+                        <ComboBoxItem Content="Contains"></ComboBoxItem>
+                        <ComboBoxItem Content="Within"></ComboBoxItem>
+                        <ComboBoxItem Content="Touches"></ComboBoxItem>
+                    </ComboBox>
+                    <Label VerticalAlignment="Center" Content=" >> Point" FontStyle="Oblique"></Label>
+
+                </StackPanel>
+
+                <StackPanel Margin="0,5,0,0">
+                    <Button x:Name="btnRunSpatial" Content="Run Selection" Margin="5,5,0,0" Height="20" Width="100" Click="btnRunSpatial_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+
+        
+        <GroupBox x:Name="grbSelectCoordinates" Header="Select coordinates" Grid.Row="3" Grid.Column ="0" Grid.ColumnSpan="2" Height="120" BorderBrush="Black">
+			<StackPanel HorizontalAlignment="Center" Margin="0,10,0,0">
+				<StackPanel Orientation="Horizontal" Margin="5">
+					<Button x:Name="btnFirst" Content="First Coordinate" Height="20" Width="120" Margin="5,0,0,0" Click="btnFirst_Click"/>
+					<TextBox x:Name="txtFirst" TextWrapping="Wrap" Margin="5,0,0,0" Text="Coordinates..." Height="20" Width="120"/>	
+				</StackPanel>
+				<StackPanel Orientation="Horizontal" Margin="5">
+					<Button x:Name="btnSecond" Content="Second coordinate" Height="20" Width="120" Margin="5,0,0,0" Click="btnSecond_Click"/>
+					<TextBox x:Name="txtSecond" TextWrapping="Wrap" Text="Coordinates..." Margin="5,0,0,0" Height="20" Width="120"/>
+				</StackPanel>
+				
+			</StackPanel>
+			
+		</GroupBox>
+		
+	</Grid>
 </Window>
