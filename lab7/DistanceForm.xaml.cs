@@ -1,21 +1,17 @@
-﻿using ArcGIS.Core.Data;
+﻿using ActiproSoftware.Products.Ribbon;
+using ArcGIS.Core.Data;
 using ArcGIS.Desktop.Core.Geoprocessing;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
+using ArcGIS.Desktop.Internal.Mapping.CommonControls;
 using ArcGIS.Desktop.Mapping;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+
 
 namespace lab7
 {
@@ -27,21 +23,26 @@ namespace lab7
 
         // Variabler
         public Map map;
-        public FeatureLayer firstLayer;
-        public FeatureLayer secondLayer;
-        public FeatureLayer polyLayer;
-        public FeatureLayer pointLayer;
+        public FeatureLayer polygonsLayer;
+        public FeatureLayer pointsLayer;
+        private string polygonFieldName;
+        private string pointFieldName;
+        private string polygonValue;
+        private string pointValue;
+
+        private string spatialRelate;
 
         public DistanceForm()
         {
             InitializeComponent();
             map = MapView.Active.Map;
+            
         }
 
         private void btnFirst_Click(object sender, RoutedEventArgs e)
         {
             this.Visibility = Visibility.Collapsed;
-           
+
         }
 
         private void btnSecond_Click(object sender, RoutedEventArgs e)
@@ -66,10 +67,10 @@ namespace lab7
         }
 
         // LÄS IN DATA
-        public string ChooseFile()
+        public string ChoosePolygonFeatureFile()
         {
             OpenFileDialog openFiles = new OpenFileDialog();
-            openFiles.InitialDirectory = @"H:\GIS_Applikationer\Lab1\Lab1\data\";
+            openFiles.InitialDirectory = @"H:\ArcGIS\Projects\DVG304_IUPG5\data";
             openFiles.Filter = "Shapefiles (*.shp)|*.shp|All files (*.*)|*.*";
 
             if (openFiles.ShowDialog() == true)
@@ -79,13 +80,31 @@ namespace lab7
             return null;
         }
 
+        public string ChoosePointFeatureFile()
+        {
+            OpenFileDialog openFiles = new OpenFileDialog();
+            openFiles.InitialDirectory = @"H:\ArcGIS\Projects\DVG304_IUPG5\data";
+            openFiles.Filter = "Shapefiles (*.shp)|*.shp|All files (*.*)|*.*";
+
+            if (openFiles.ShowDialog() == true)
+            {
+                return openFiles.FileName;
+            }
+            return null;
+        }
+
+
         // FILTRERA DATA
+
+        /*
+         * 
+        
 
         private async void FilterDATA()
         {
             if (cmbFields.SelectedItem is not string field ||
                 cmbValues.SelectedItem is not string value ||
-                secondLayer == null)
+                pointsLayer == null)
             {
                 MessageBox.Show("Du måste välja ett fält och ett värde först.");
                 return;
@@ -100,18 +119,18 @@ namespace lab7
                     WhereClause = whereClause
                 };
 
-                secondLayer.ClearSelection();
-                secondLayer.Select(queryFilter, SelectionCombinationMethod.New);
+                pointsLayer.ClearSelection();
+                pointsLayer.Select(queryFilter, SelectionCombinationMethod.New);
 
-                var outputPath = @"H:\GIS_Applikationer\Lab1\Lab1\Lab7\selectedPoly.shp";
-                var parameters = Geoprocessing.MakeValueArray(secondLayer, outputPath);
+                var outputPath = @"H:\selectedPoly.shp";
+                var parameters = Geoprocessing.MakeValueArray(pointsLayer, outputPath);
 
                 Geoprocessing.ExecuteToolAsync("management.CopyFeatures", parameters);
                 _ = removeLayerIfExists("selectedPoly.shp");
             });
         }
-
-
+        
+         */
 
         // Fält
         public void LoadFieldsFromSelectedLayer(FeatureLayer selectedLayer)
@@ -121,18 +140,38 @@ namespace lab7
                 var inspector = new ArcGIS.Desktop.Editing.Attributes.Inspector();
                 inspector.LoadSchema(selectedLayer);
 
-                this.Dispatcher.Invoke(() => cmbFields.Items.Clear());
-
-                foreach (var attribute in inspector)
+                if(selectedLayer == polygonsLayer)
                 {
-                    if (!attribute.IsSystemField && !attribute.IsGeometryField)
+                    //this.Dispatcher.Invoke(() => cmbPolygonFields.Items.Clear());
+
+                    foreach (var attribute in inspector)
                     {
-                        var fldName = attribute.FieldName;
-                        this.Dispatcher.Invoke(() => cmbFields.Items.Add(fldName));
+                        if (!attribute.IsSystemField && !attribute.IsGeometryField)
+                        {
+                            var fldName = attribute.FieldName;
+                            this.Dispatcher.Invoke(() => cmbPolygonFields.Items.Add(fldName));
+                        }
                     }
                 }
+                if(selectedLayer == pointsLayer)
+                {
+                    //this.Dispatcher.Invoke(() => cmbPointFields.Items.Clear());
+
+                    foreach (var attribute in inspector)
+                    {
+                        if (!attribute.IsSystemField && !attribute.IsGeometryField)
+                        {
+                            var fldName = attribute.FieldName;
+                            this.Dispatcher.Invoke(() => cmbPointFields.Items.Add(fldName));
+                        }
+                    }
+                }
+
+                
             });
         }
+
+
 
         // Värden
         public void LoadValuesForField(FeatureLayer layer, string fieldName)
@@ -141,11 +180,8 @@ namespace lab7
             {
                 using (var table = layer.GetTable())
                 {
-                    var query = new QueryFilter
-                    {
-                        SubFields = fieldName
-                    };
-
+                    var query = new QueryFilter();
+                    
                     var values = new HashSet<string>();
                     using (var cursor = table.Search(query, false))
                     {
@@ -162,9 +198,19 @@ namespace lab7
 
                     this.Dispatcher.Invoke(() =>
                     {
-                        cmbValues.Items.Clear();
-                        foreach (var val in sortedValues)
-                            cmbValues.Items.Add(val);
+                        if(layer == polygonsLayer)
+                        {
+                            //cmbPolygonValues.Items.Clear();
+                            foreach (var val in sortedValues)
+                                cmbPolygonValues.Items.Add(val);
+                        }
+                        if(layer == pointsLayer)
+                        {
+                            //cmbPointsValues.Items.Clear();
+                            foreach (var val in sortedValues)
+                                cmbPointValues.Items.Add(val);
+                        }
+                        
                     });
                 }
             });
@@ -174,7 +220,7 @@ namespace lab7
         {
             QueuedTask.Run(() =>
             {
-                string whereClause = $"{field} = '{value.Replace("'", "''")}'";
+                string whereClause = $"{field} = '{value}'";
                 var queryFilter = new QueryFilter
                 {
                     WhereClause = whereClause
@@ -184,12 +230,53 @@ namespace lab7
             });
         }
 
-        
+
+
+        //Polygon data
+        private async void btnSelectPolygonData_Click(object sender, RoutedEventArgs e)
+        {
+            string selectedFilePath = ChoosePolygonFeatureFile();
+            if (string.IsNullOrEmpty(selectedFilePath))
+            {
+                return;
+            }
+            var progress = new ProgressDialog("Adding layer to map...", "Cancel", 100, true);
+            progress.Show();
+
+            try
+            {
+                map = MapView.Active.Map;
+                await QueuedTask.Run(() =>
+                {
+                    Layer layer = LayerFactory.Instance.CreateLayer(new Uri(selectedFilePath), map);
+                    if (layer is FeatureLayer featureLayer)
+                    {
+                        polygonsLayer = featureLayer;
+                        LoadFieldsFromSelectedLayer(polygonsLayer);
+                        //FilterDATA();
+                    }
+                    else
+                    {
+                        ArcGIS.Desktop.Framework.Dialogs.MessageBox.Show("This is not a feature layer..");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error adding layer: " + ex.Message);
+            }
+            finally
+            {
+                progress.Hide();
+            }
+        }
+
+
         // Punkt data
         private async void btnSelectPointData_Click(object sender, RoutedEventArgs e)
         {
             
-            string selectedFilePath = ChooseFile();
+            string selectedFilePath = ChoosePointFeatureFile();
             if (string.IsNullOrEmpty(selectedFilePath))
             {
                 return;
@@ -205,9 +292,9 @@ namespace lab7
                     Layer layer = LayerFactory.Instance.CreateLayer(new Uri(selectedFilePath), map);
                     if (layer is FeatureLayer featureLayer)
                     {
-                        firstLayer = featureLayer;
-                        FilterDATA();
-                        LoadFieldsFromSelectedLayer(firstLayer);
+                        pointsLayer = featureLayer;
+                        //FilterDATA();
+                        LoadFieldsFromSelectedLayer(pointsLayer);
                     } 
                     else
                     {
@@ -225,119 +312,134 @@ namespace lab7
             }
         }
 
-        //Polygon data
-        private async void btnSelectPolygonData_Click(object sender, RoutedEventArgs e)
-        {
-            string selectedFilePath = ChooseFile();
-            if (string.IsNullOrEmpty(selectedFilePath))
-            {
-                return;
-            }
-            var progress = new ProgressDialog("Adding layer to map...", "Cancel", 100, true);
-            progress.Show();
 
-            try
+        private void SpatialFilter()
+        {
+            QueuedTask.Run(() =>
             {
-                map = MapView.Active.Map;
-                await QueuedTask.Run(() =>
+                var map = MapView.Active.Map;
+                if (map == null)
+                    return;
+
+
+
+                var selectedPolygon = default(ArcGIS.Core.Geometry.Geometry);
+                string whereClause = $"{polygonFieldName} = '{polygonValue}'";
+                MessageBox.Show(whereClause.ToString());
+                QueryFilter queryFilter = new QueryFilter
                 {
-                    Layer layer = LayerFactory.Instance.CreateLayer(new Uri(selectedFilePath), map);
-                    if (layer is FeatureLayer featureLayer)
-                    {
-                        secondLayer = featureLayer;
-                        LoadFieldsFromSelectedLayer(secondLayer);
-                        FilterDATA();
-                    }
-                    else
-                    {
-                        ArcGIS.Desktop.Framework.Dialogs.MessageBox.Show("This is not a feature layer..");
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error adding layer: " + ex.Message);
-            }
-            finally
-            {
-                progress.Hide();
-            }
+                    WhereClause = whereClause
+                };
+                var rowCursor = polygonsLayer.Search(queryFilter);
+                while (rowCursor.MoveNext())
+                {
+                    var feature = rowCursor.Current as ArcGIS.Core.Data.Feature;
+                    selectedPolygon = feature.GetShape();
+                }
+
+                SpatialRelationship sr = SpatialRelationship.Intersects;
+                switch (spatialRelate)
+                {
+                    case "Intersects":
+                        sr = SpatialRelationship.Intersects;
+                        break;
+                    case "Within":
+                        sr = SpatialRelationship.Within;
+                        break;
+                    case "Contains":
+                        sr = SpatialRelationship.Contains;
+                        break;
+                    case "Touches":
+                        sr = SpatialRelationship.Touches;
+                        break;
+                }
+
+                var spatialFilter = new ArcGIS.Core.Data.SpatialQueryFilter
+                {
+                    FilterGeometry = selectedPolygon,
+                    SpatialRelationship = sr
+                };
+
+                var selection = pointsLayer.Select(spatialFilter, SelectionCombinationMethod.New);
+                var objectIds = selection.GetObjectIDs();
+
+
+                // Spatial join
+                var outputFeatureClass = @"H:\ArcGIS\Projects\DVG304_IUPG5\data";
+                Geoprocessing.ExecuteToolAsync("management.CopyFeatures", new string[] { string.Join(",", objectIds), outputFeatureClass });
+                
+                // Clear the selection
+                pointsLayer.ClearSelection();
+                ArcGIS.Desktop.Framework.Dialogs.MessageBox.Show("Spatial filter applied successfully! ", "Info");
+            });
         }
-        
+
 
 
         // Combobox
-        private void cmbFields_SelectionChanged(object sender, SelectionChangedEventArgs e)
+
+
+        private void cmbPolygonFields_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (cmbFields.SelectedItem is string selectedField && firstLayer != null)
+            if (cmbPolygonFields.SelectedItem is string selectedField && polygonsLayer != null)
             {
-                LoadValuesForField(firstLayer, selectedField);
-                LoadValuesForField(secondLayer, selectedField);
+                polygonFieldName = cmbPolygonFields.SelectedItem.ToString();
+                LoadValuesForField(polygonsLayer, polygonFieldName);
+            }
+        }
+        private void cmbPointFields_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cmbPointFields.SelectedItem is string selectedField && polygonsLayer != null)
+            {
+                pointFieldName = cmbPointFields.SelectedItem.ToString();
+                LoadValuesForField(pointsLayer, pointFieldName);
+            }
+
+        }
+
+        
+
+        private void cmbPolygonValues_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cmbPolygonValues.SelectedItem is string selectedField && cmbPolygonValues.SelectedItem is string valuePolygons && polygonsLayer != null)
+            {
+                polygonValue = cmbPolygonValues.SelectedItem.ToString();
+                //ApplyAttributeFilter(polygonsLayer, polygonFieldName, polygonValue);
+            }
+
+        }
+
+        private void cmbPointValues_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cmbPointValues.SelectedItem is string selectedField && cmbPointValues.SelectedItem is string valuePoints && pointsLayer != null)
+            {
+                pointValue = cmbPointValues.SelectedItem.ToString();
+                //ApplyAttributeFilter(pointsLayer, pointFieldName, pointValue);
             }
         }
 
-        private void cmbValues_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void cmbSpatial_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (cmbFields.SelectedItem is string fieldFirst && cmbValues.SelectedItem is string valueFirst && firstLayer != null)
+            if (cmbSpatial.SelectedItem is string selectedField)
             {
-                ApplyAttributeFilter(firstLayer, fieldFirst, valueFirst);
-            }
-            if(cmbFields.SelectedItem is string fieldSecond && cmbValues.SelectedItem is string valueSecond && secondLayer != null)
-            {
-                ApplyAttributeFilter(secondLayer, fieldSecond, valueSecond);
+                spatialRelate = selectedField;
+                
             }
         }
 
-        private async void btnAddData_Click(object sender, RoutedEventArgs e)
+        private void btnRunSpatial_Click(object sender, RoutedEventArgs e)
         {
-            string selectedFilePath = ChooseFile();
-            if (string.IsNullOrEmpty(selectedFilePath))
-                return;
-
-            var progress = new ProgressDialog("Adding layer to map...", "Cancel", 100, true);
-            progress.Show();
-
-            try
-            {
-                map = MapView.Active.Map;
-                await QueuedTask.Run(() =>
-                {
-                    Layer layer = LayerFactory.Instance.CreateLayer(new Uri(selectedFilePath), map);
-                    if (layer is FeatureLayer featureLayer)
-                    {
-                        string msg = "Vilken typ av geografiska objekt innehåller shapefilen?\nYes for Polygon and No for Point.";
-                        var result = MessageBox.Show(msg, "Datatyp", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Yes);
-
-                        if (result == MessageBoxResult.Yes)
-                        {
-                            // Polygon
-                            firstLayer = featureLayer;
-                            LoadFieldsFromSelectedLayer(firstLayer);
-                            //FilterDATA();
-                        }
-                        else if (result == MessageBoxResult.No)
-                        {
-                            // Point
-                            secondLayer = featureLayer;
-                            LoadFieldsFromSelectedLayer(secondLayer);
-                            FilterDATA();
-                        }
-                    }
-                    else
-                    {
-                        ArcGIS.Desktop.Framework.Dialogs.MessageBox.Show("This is not a feature layer..");
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error adding layer: " + ex.Message);
-            }
-            finally
-            {
-                progress.Hide();
-            }
+            SpatialFilter();
         }
 
+        private void btnHighlightPolygons_Click(object sender, RoutedEventArgs e)
+        {
+            ApplyAttributeFilter(polygonsLayer, polygonFieldName, polygonValue);
+        }
+
+        private void btnHighlightPoints_Click(object sender, RoutedEventArgs e)
+        {
+            ApplyAttributeFilter(pointsLayer, pointFieldName, pointValue);
+        }
     }
 }
