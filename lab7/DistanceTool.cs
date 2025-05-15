@@ -5,6 +5,8 @@ using ArcGIS.Desktop.Mapping;
 using System.Threading.Tasks;
 using System.Windows.Documents;
 using System.Collections.Generic;
+using System.Windows;
+using System;
 
 namespace lab7
 {
@@ -14,12 +16,16 @@ namespace lab7
         private DistanceForm distanceForm;  
         private MapPoint firstClickedPoint;
         private MapPoint secondClickedPoint;
-        private List<MapPoint> clickedPoints = [];
+        private List<MapPoint> overlays = new List<MapPoint>();
         private int clickCount = 0;
+
+        // Ta bort dem övriga punkterna
+        private CIMMarker firstMarker;
+        private CIMPointSymbol markerToRemove;
 
         public DistanceTool()
         {
-            System.Windows.MessageBox.Show("Distance tool active");
+            System.Windows.MessageBox.Show("Distance tool is now active.");
             IsSketchTool = true;
             SketchType = SketchGeometryType.Rectangle;
             SketchOutputMode = SketchOutputMode.Map;
@@ -44,8 +50,8 @@ namespace lab7
         {
             await QueuedTask.Run(() =>
             {
-                CIMMarker marker = SymbolFactory.Instance.ConstructMarker(ColorFactory.Instance.GreenRGB, 8.0, SimpleMarkerStyle.Pushpin);
-                CIMPointSymbol pointSymbolFromMarker = SymbolFactory.Instance.ConstructPointSymbol(marker);
+                firstMarker = SymbolFactory.Instance.ConstructMarker(ColorFactory.Instance.RedRGB, 20.0, SimpleMarkerStyle.Pushpin);
+                CIMPointSymbol pointSymbolFromMarker = SymbolFactory.Instance.ConstructPointSymbol(firstMarker);
                 var symbolReference = pointSymbolFromMarker.MakeSymbolReference();
                 
                 var graphic = new CIMPointGraphic
@@ -56,6 +62,17 @@ namespace lab7
                 };
                 var overlay = MapView.Active.AddOverlay(graphic);
             });
+        }
+
+        private async Task RemoveMarker(CIMPointSymbol marker)
+        {
+            if (clickCount > 2)
+            {
+                await QueuedTask.Run(() =>
+                {
+                    
+                });
+            }
         }
 
         private async Task CalculateDistance()
@@ -69,7 +86,7 @@ namespace lab7
 
                 await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    System.Windows.MessageBox.Show($"Distance between the two points: {distance:F2} meters");
+                    System.Windows.MessageBox.Show($"Distance between the two points: {distance} meters");
                 });
             }
         }
@@ -89,7 +106,7 @@ namespace lab7
                     firstClickedPoint = clickedPoint;
                     System.Windows.MessageBox.Show(string.Format("X: {0} Y: {1} Z: {2}",
                         clickedPoint.X, clickedPoint.Y, clickedPoint.Z), "Map Coordinates");
-                    AddMarker(firstClickedPoint);
+                    _=AddMarker(firstClickedPoint);
 
                     System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                     {
@@ -103,25 +120,28 @@ namespace lab7
                     secondClickedPoint = clickedPoint;
                     System.Windows.MessageBox.Show(string.Format("X: {0} Y: {1} Z: {2}",
                         clickedPoint.X, clickedPoint.Y, clickedPoint.Z), "Map Coordinates");
-                    AddMarker(secondClickedPoint);
+                    _=AddMarker(secondClickedPoint);
                     System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                     {
                         distanceForm.Visibility = System.Windows.Visibility.Visible;
-                        distanceForm.txtSecond.Text = secondClickedPoint.X.ToString() + " " + secondClickedPoint.Y.ToString();
-                        _ = CalculateDistance();
+                        distanceForm.txtSecond.Text = secondClickedPoint.X.ToString() + " " + secondClickedPoint.Y.ToString(); 
                     });
+                    _=CalculateDistance();
+                    
                 }
 
-                // Återställ vid tredje klicket
+                // Reset 
                 if (clickCount > 2)
                 {
                     clickCount = 1;
                     firstClickedPoint = clickedPoint;
                     secondClickedPoint = null;
-
+                    //_=RemoveMarker(secondClickedPoint);
+               
                     System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                     {
                         distanceForm.txtFirst.Text = firstClickedPoint.X.ToString() + " " + firstClickedPoint.Y.ToString();
+                        distanceForm.Visibility = System.Windows.Visibility.Visible;
                         distanceForm.txtSecond.Clear();
                     });
                     _ = CalculateDistance();

@@ -93,45 +93,6 @@ namespace lab7
             return null;
         }
 
-
-        // FILTRERA DATA
-
-        /*
-         * 
-        
-
-        private async void FilterDATA()
-        {
-            if (cmbFields.SelectedItem is not string field ||
-                cmbValues.SelectedItem is not string value ||
-                pointsLayer == null)
-            {
-                MessageBox.Show("Du måste välja ett fält och ett värde först.");
-                return;
-            }
-
-            string whereClause = $"{field} = '{value.Replace("'", "''")}'"; // Hanterar eventuella apostrofer
-
-            await QueuedTask.Run(() =>
-            {
-                var queryFilter = new QueryFilter
-                {
-                    WhereClause = whereClause
-                };
-
-                pointsLayer.ClearSelection();
-                pointsLayer.Select(queryFilter, SelectionCombinationMethod.New);
-
-                var outputPath = @"H:\selectedPoly.shp";
-                var parameters = Geoprocessing.MakeValueArray(pointsLayer, outputPath);
-
-                Geoprocessing.ExecuteToolAsync("management.CopyFeatures", parameters);
-                _ = removeLayerIfExists("selectedPoly.shp");
-            });
-        }
-        
-         */
-
         // Fält
         public void LoadFieldsFromSelectedLayer(FeatureLayer selectedLayer)
         {

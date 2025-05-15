@@ -30,7 +30,7 @@
       
 		<controls>        
 		  <!-- add your controls here -->
-        <tool id="lab7_DistanceTool" caption="Distance tool" className="DistanceTool" loadOnClick="true" smallImage="Sun32" largeImage="Sun32" condition="esri_mapping_mapPane">
+        <tool id="lab7_DistanceTool" caption="Distance tool" className="DistanceTool" loadOnClick="true" smallImage="Measure_Distance16" largeImage="Measure_Distance16" condition="esri_mapping_mapPane">
           <tooltip heading="Uppgift 7">Uppgift 7<disabledText /></tooltip>
         </tool>
         <button id="DistanceFormButton" caption="Open Distance form" className="Open_Distance_form" loadOnClick="true" smallImage="Measure_Distance16" largeImage="Measure_Distance32">
