@@ -8,6 +8,7 @@
 		ResizeMode="NoResize"
 		
         Title="Distance form" Height="600" Width="320">
+
     <Grid x:Name="mainGrid" Margin="5" Background="#FFCECEA3">
 
 		<!-- 2 x 2 -->
