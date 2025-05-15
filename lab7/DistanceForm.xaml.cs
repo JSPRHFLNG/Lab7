@@ -97,10 +97,6 @@ namespace lab7
             return null;
         }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 9bb54def1a019512bbd1c39bf9c10dfa1185d985
         // Fält
         public void LoadFieldsFromSelectedLayer(FeatureLayer selectedLayer)
         {
