@@ -7,6 +7,8 @@ using System.Windows.Documents;
 using System.Collections.Generic;
 using System.Windows;
 using System;
+using System.Windows.Threading;
+using ActiproSoftware.Windows.Extensions;
 
 namespace lab7
 {
@@ -87,7 +89,13 @@ namespace lab7
                 await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     System.Windows.MessageBox.Show($"Distance between the two points: {distance} meters");
+                    System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+                    {
+                        distanceForm.txtdistance.Text = Math.Round(distance,0).ToString() + " Meters";
+                    });
+
                 });
+                
             }
         }
 

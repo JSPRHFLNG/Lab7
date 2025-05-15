@@ -7,7 +7,7 @@
         mc:Ignorable="d"
 		ResizeMode="NoResize"
 		
-        Title="Distance form" Height="680" Width="330">
+        Title="Distance form" Height="695" Width="330">
 
     <Grid x:Name="mainGrid" Margin="5" Background="#FFCECEA3">
 
@@ -107,7 +107,8 @@
                     <Button x:Name="btnSecond" Content="Second coordinate" HorizontalAlignment="Left" Height="20" Width="120" Margin="5,0,0,5" Click="btnSecond_Click"/>
 					<TextBox x:Name="txtSecond" TextWrapping="Wrap" Text="Coordinates..." Margin="5,0,0,0" Height="25" Width="300"/>
 				</StackPanel>
-                <TextBox x:Name="txtdistance" TextWrapping="Wrap" Text="Distance between markers..." HorizontalAlignment="Center" Margin="10,20,10,0" Height="25" Width="260"/>
+                <Label Content="Distance between markers" HorizontalAlignment="Center" Margin="2"></Label>
+                <TextBox x:Name="txtdistance" TextWrapping="Wrap" Text="Distance between markers..." HorizontalAlignment="Center" Margin="10,0,10,0" Height="25" Width="260"/>
 				
 			</StackPanel>
 			
