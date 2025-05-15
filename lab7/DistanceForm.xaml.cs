@@ -1,8 +1,7 @@
-﻿using ActiproSoftware.Products.Ribbon;
+﻿
 using ArcGIS.Core.Data;
 using ArcGIS.Desktop.Core.Geoprocessing;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
-using ArcGIS.Desktop.Internal.Mapping.CommonControls;
 using ArcGIS.Desktop.Mapping;
 using Microsoft.Win32;
 using System;
@@ -36,7 +35,12 @@ namespace lab7
         {
             InitializeComponent();
             map = MapView.Active.Map;
-            
+
+            cbb_spatial.Items.Add("Intersects");
+            cbb_spatial.Items.Add("Contains");
+            cbb_spatial.Items.Add("Within");
+            cbb_spatial.Items.Add("Touches");
+            cbb_spatial.Items.Add("Undefined");
         }
 
         private void btnFirst_Click(object sender, RoutedEventArgs e)
@@ -93,44 +97,6 @@ namespace lab7
             return null;
         }
 
-
-        // FILTRERA DATA
-
-        /*
-         * 
-        
-
-        private async void FilterDATA()
-        {
-            if (cmbFields.SelectedItem is not string field ||
-                cmbValues.SelectedItem is not string value ||
-                pointsLayer == null)
-            {
-                MessageBox.Show("Du måste välja ett fält och ett värde först.");
-                return;
-            }
-
-            string whereClause = $"{field} = '{value.Replace("'", "''")}'"; // Hanterar eventuella apostrofer
-
-            await QueuedTask.Run(() =>
-            {
-                var queryFilter = new QueryFilter
-                {
-                    WhereClause = whereClause
-                };
-
-                pointsLayer.ClearSelection();
-                pointsLayer.Select(queryFilter, SelectionCombinationMethod.New);
-
-                var outputPath = @"H:\selectedPoly.shp";
-                var parameters = Geoprocessing.MakeValueArray(pointsLayer, outputPath);
-
-                Geoprocessing.ExecuteToolAsync("management.CopyFeatures", parameters);
-                _ = removeLayerIfExists("selectedPoly.shp");
-            });
-        }
-        
-         */
 
         // Fält
         public void LoadFieldsFromSelectedLayer(FeatureLayer selectedLayer)
@@ -206,7 +172,6 @@ namespace lab7
                         }
                         if(layer == pointsLayer)
                         {
-                            //cmbPointsValues.Items.Clear();
                             foreach (var val in sortedValues)
                                 cmbPointValues.Items.Add(val);
                         }
@@ -253,7 +218,7 @@ namespace lab7
                     {
                         polygonsLayer = featureLayer;
                         LoadFieldsFromSelectedLayer(polygonsLayer);
-                        //FilterDATA();
+                        
                     }
                     else
                     {
@@ -293,12 +258,12 @@ namespace lab7
                     if (layer is FeatureLayer featureLayer)
                     {
                         pointsLayer = featureLayer;
-                        //FilterDATA();
+                       
                         LoadFieldsFromSelectedLayer(pointsLayer);
                     } 
                     else
                     {
-                        ArcGIS.Desktop.Framework.Dialogs.MessageBox.Show("This is not a feature layer..");
+                        ArcGIS.Desktop.Framework.Dialogs.MessageBox.Show("This is not a feature layer.", "Info");
                     }
                 });
             }
@@ -322,10 +287,9 @@ namespace lab7
                     return;
 
 
-
                 var selectedPolygon = default(ArcGIS.Core.Geometry.Geometry);
                 string whereClause = $"{polygonFieldName} = '{polygonValue}'";
-                MessageBox.Show(whereClause.ToString());
+
                 QueryFilter queryFilter = new QueryFilter
                 {
                     WhereClause = whereClause
@@ -333,31 +297,68 @@ namespace lab7
                 var rowCursor = polygonsLayer.Search(queryFilter);
                 while (rowCursor.MoveNext())
                 {
-                    var feature = rowCursor.Current as ArcGIS.Core.Data.Feature;
+                    var feature = rowCursor.Current as Feature;
                     selectedPolygon = feature.GetShape();
                 }
 
+
                 SpatialRelationship sr = SpatialRelationship.Intersects;
+               
                 switch (spatialRelate)
                 {
-                    case "Intersects":
+                    case "intersects":
                         sr = SpatialRelationship.Intersects;
+                        ArcGIS.Desktop.Framework.Dialogs.MessageBox.Show("Applying expression with Intersects", "Info");
                         break;
-                    case "Within":
+                    case "within":
                         sr = SpatialRelationship.Within;
+                        ArcGIS.Desktop.Framework.Dialogs.MessageBox.Show("Applying expression with Within", "Info");
                         break;
-                    case "Contains":
+                    case "contains":
                         sr = SpatialRelationship.Contains;
+                        ArcGIS.Desktop.Framework.Dialogs.MessageBox.Show("Applying expression with Contains", "Info");
                         break;
-                    case "Touches":
+                    case "touches":
                         sr = SpatialRelationship.Touches;
+                        ArcGIS.Desktop.Framework.Dialogs.MessageBox.Show("Applying expression with Touches", "Info");
+                        break;
+                    case "undefined":
+                        sr = SpatialRelationship.Undefined;
+                        ArcGIS.Desktop.Framework.Dialogs.MessageBox.Show("Applying expression with Undefined", "Info");
+                        break;
+                    default:
+                        
+                        ArcGIS.Desktop.Framework.Dialogs.MessageBox.Show("No matching expression found. Applying default expression Intersects", "Info");
                         break;
                 }
 
-                var spatialFilter = new ArcGIS.Core.Data.SpatialQueryFilter
+                string pointAttributeClause = $"{pointFieldName} = '{pointValue}'";
+                var spatialFilter = new SpatialQueryFilter
                 {
                     FilterGeometry = selectedPolygon,
-                    SpatialRelationship = sr
+                    SpatialRelationship = sr,
+                    WhereClause = pointAttributeClause
+                };
+
+                var pointTable = pointsLayer.GetTable();
+                var matchingObjectIDs = new List<long>();
+                using (var cursor = pointTable.Search(spatialFilter, false))
+                {
+                    while (cursor.MoveNext())
+                    {
+                        matchingObjectIDs.Add(cursor.Current.GetObjectID());
+                    }
+                }
+
+                if (matchingObjectIDs.Count == 0)
+                {
+                    ArcGIS.Desktop.Framework.Dialogs.MessageBox.Show("No matching points found with given spatial and attribute filters.", "Info");
+                    return;
+                }
+
+                var objectIDidFilter = new QueryFilter
+                {
+                    ObjectIDs = matchingObjectIDs
                 };
 
                 var selection = pointsLayer.Select(spatialFilter, SelectionCombinationMethod.New);
@@ -365,19 +366,23 @@ namespace lab7
 
 
                 // Spatial join
-                var outputFeatureClass = @"H:\ArcGIS\Projects\DVG304_IUPG5\data";
-                Geoprocessing.ExecuteToolAsync("management.CopyFeatures", new string[] { string.Join(",", objectIds), outputFeatureClass });
+                var outputFeatureClass = @"H:\ArcGIS\Projects\DVG304_IUPG5\DVG304_IUPG5.gdb\result_point_feature";
+
+                var parameters = Geoprocessing.MakeValueArray(pointsLayer, outputFeatureClass);
+                Geoprocessing.ExecuteToolAsync("management.CopyFeatures", parameters);
                 
                 // Clear the selection
                 pointsLayer.ClearSelection();
+                polygonsLayer.ClearSelection();
+                pointsLayer.SetVisibility(false);
                 ArcGIS.Desktop.Framework.Dialogs.MessageBox.Show("Spatial filter applied successfully! ", "Info");
             });
         }
 
+        
 
 
         // Combobox
-
 
         private void cmbPolygonFields_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -387,6 +392,8 @@ namespace lab7
                 LoadValuesForField(polygonsLayer, polygonFieldName);
             }
         }
+
+
         private void cmbPointFields_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (cmbPointFields.SelectedItem is string selectedField && polygonsLayer != null)
@@ -394,7 +401,6 @@ namespace lab7
                 pointFieldName = cmbPointFields.SelectedItem.ToString();
                 LoadValuesForField(pointsLayer, pointFieldName);
             }
-
         }
 
         
@@ -404,9 +410,7 @@ namespace lab7
             if (cmbPolygonValues.SelectedItem is string selectedField && cmbPolygonValues.SelectedItem is string valuePolygons && polygonsLayer != null)
             {
                 polygonValue = cmbPolygonValues.SelectedItem.ToString();
-                //ApplyAttributeFilter(polygonsLayer, polygonFieldName, polygonValue);
             }
-
         }
 
         private void cmbPointValues_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -414,22 +418,26 @@ namespace lab7
             if (cmbPointValues.SelectedItem is string selectedField && cmbPointValues.SelectedItem is string valuePoints && pointsLayer != null)
             {
                 pointValue = cmbPointValues.SelectedItem.ToString();
-                //ApplyAttributeFilter(pointsLayer, pointFieldName, pointValue);
             }
         }
 
-        private void cmbSpatial_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void cbb_spatial_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (cmbSpatial.SelectedItem is string selectedField)
+            if (cbb_spatial.SelectedIndex != 0)
             {
-                spatialRelate = selectedField;
-                
+                spatialRelate = cbb_spatial.SelectedItem.ToString().ToLower();
             }
         }
 
         private void btnRunSpatial_Click(object sender, RoutedEventArgs e)
         {
             SpatialFilter();
+
+            lbxSpatial.Items.Clear();
+            lbxSpatial.Items.Add("Selected polygon: " + (string)polygonValue);
+            lbxSpatial.Items.Add("Spat.rel: " + spatialRelate);
+            lbxSpatial.Items.Add("Selected points: " + (string)pointValue);
+
         }
 
         private void btnHighlightPolygons_Click(object sender, RoutedEventArgs e)
@@ -441,5 +449,7 @@ namespace lab7
         {
             ApplyAttributeFilter(pointsLayer, pointFieldName, pointValue);
         }
+
+        
     }
 }
