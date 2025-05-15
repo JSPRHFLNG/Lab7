@@ -3,23 +3,27 @@ using ArcGIS.Core.Geometry;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Mapping;
 using System.Threading.Tasks;
+using System.Windows.Documents;
+using System.Collections.Generic;
 
 namespace lab7
 {
     internal class DistanceTool : MapTool
     {
-        public Map map;
-        public DistanceForm distanceForm;  
-        public MapPoint firstClickedPoint;
-        public MapPoint secondClickedPoint;
+        private Map map;
+        private DistanceForm distanceForm;  
+        private MapPoint firstClickedPoint;
+        private MapPoint secondClickedPoint;
+        private List<MapPoint> clickedPoints = [];
         private int clickCount = 0;
 
         public DistanceTool()
         {
-            IsSketchTool = false;
+            System.Windows.MessageBox.Show("Distance tool active");
+            IsSketchTool = true;
             SketchType = SketchGeometryType.Rectangle;
             SketchOutputMode = SketchOutputMode.Map;
-            distanceForm = new DistanceForm();         
+            distanceForm = new DistanceForm();
             distanceForm.Visibility = System.Windows.Visibility.Visible;
             firstClickedPoint = null;
             secondClickedPoint = null;
@@ -47,7 +51,8 @@ namespace lab7
                 var graphic = new CIMPointGraphic
                 {
                     Symbol = symbolReference,
-                    Location = point
+                    Location = point,
+                    
                 };
                 var overlay = MapView.Active.AddOverlay(graphic);
             });
@@ -72,6 +77,7 @@ namespace lab7
 
         protected override Task HandleMouseDownAsync(MapViewMouseButtonEventArgs args)
         {
+            
             return QueuedTask.Run(() =>
             {
                 clickCount++;
@@ -83,7 +89,7 @@ namespace lab7
                     firstClickedPoint = clickedPoint;
                     System.Windows.MessageBox.Show(string.Format("X: {0} Y: {1} Z: {2}",
                         clickedPoint.X, clickedPoint.Y, clickedPoint.Z), "Map Coordinates");
-                    _ = AddMarker(firstClickedPoint);
+                    AddMarker(firstClickedPoint);
 
                     System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                     {
@@ -97,7 +103,7 @@ namespace lab7
                     secondClickedPoint = clickedPoint;
                     System.Windows.MessageBox.Show(string.Format("X: {0} Y: {1} Z: {2}",
                         clickedPoint.X, clickedPoint.Y, clickedPoint.Z), "Map Coordinates");
-                    _ = AddMarker(secondClickedPoint);
+                    AddMarker(secondClickedPoint);
                     System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                     {
                         distanceForm.Visibility = System.Windows.Visibility.Visible;
@@ -122,8 +128,6 @@ namespace lab7
                 }
             });
         }
-
-
 
         protected override Task OnToolActivateAsync(bool active)
         {

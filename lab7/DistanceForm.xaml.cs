@@ -70,7 +70,7 @@ namespace lab7
         public string ChoosePolygonFeatureFile()
         {
             OpenFileDialog openFiles = new OpenFileDialog();
-            openFiles.InitialDirectory = @"H:\ArcGIS\Projects\DVG304_IUPG5\data";
+            openFiles.InitialDirectory = @"H:\ArcGIS\Projects\DVG304_IUPG7\data";
             openFiles.Filter = "Shapefiles (*.shp)|*.shp|All files (*.*)|*.*";
 
             if (openFiles.ShowDialog() == true)
@@ -83,7 +83,7 @@ namespace lab7
         public string ChoosePointFeatureFile()
         {
             OpenFileDialog openFiles = new OpenFileDialog();
-            openFiles.InitialDirectory = @"H:\ArcGIS\Projects\DVG304_IUPG5\data";
+            openFiles.InitialDirectory = @"H:\ArcGIS\Projects\DVG304_IUPG7\data";
             openFiles.Filter = "Shapefiles (*.shp)|*.shp|All files (*.*)|*.*";
 
             if (openFiles.ShowDialog() == true)
@@ -365,7 +365,7 @@ namespace lab7
 
 
                 // Spatial join
-                var outputFeatureClass = @"H:\ArcGIS\Projects\DVG304_IUPG5\data";
+                var outputFeatureClass = @"H:\ArcGIS\Projects\DVG304_IUPG7\data\filteredData";
                 Geoprocessing.ExecuteToolAsync("management.CopyFeatures", new string[] { string.Join(",", objectIds), outputFeatureClass });
                 
                 // Clear the selection
