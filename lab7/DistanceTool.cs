@@ -88,7 +88,7 @@ namespace lab7
 
                 await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    System.Windows.MessageBox.Show($"Distance between the two points: {distance} meters");
+                    System.Windows.MessageBox.Show($"Distance between the two points: {Math.Round(distance, 1)} meters");
                     System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                     {
                         distanceForm.txtdistance.Text = Math.Round(distance,0).ToString() + " Meters";
